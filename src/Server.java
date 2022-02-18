@@ -4,6 +4,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import static java.lang.Integer.parseInt;
+
 public class Server {
     private DatagramSocket datagramSocket;
     private byte[] buffer=new byte[256];
@@ -20,9 +22,43 @@ public class Server {
                 InetAddress inetAddress = datagramPacket.getAddress();
                 int port = datagramPacket.getPort();
                 String messageFromClient = new String (datagramPacket.getData(),0,datagramPacket.getLength());
-                System.out.println("Message from client: "+ messageFromClient);
+                int firstNumber = parseInt(messageFromClient);
+                System.out.println("First number from client: "+ messageFromClient);
                 datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
                 datagramSocket.send(datagramPacket);
+
+                datagramSocket.receive(datagramPacket);
+                inetAddress = datagramPacket.getAddress();
+                port = datagramPacket.getPort();
+                messageFromClient = new String (datagramPacket.getData(),0,datagramPacket.getLength());
+                int secondNumber = parseInt(messageFromClient);
+                System.out.println("Second number from client: "+ messageFromClient);
+                datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
+                datagramSocket.send(datagramPacket);
+
+                datagramSocket.receive(datagramPacket);
+                inetAddress = datagramPacket.getAddress();
+                port = datagramPacket.getPort();
+                messageFromClient = new String (datagramPacket.getData(),0,datagramPacket.getLength());
+                System.out.println("Addition(a) or subtraction(s): "+ messageFromClient);
+
+                String sendResult;
+                if (messageFromClient.equals("a")){
+                    int result = firstNumber+secondNumber;
+                    sendResult=Integer.toString(result);
+                    buffer = sendResult.getBytes();
+                    datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
+                    datagramSocket.send(datagramPacket);
+                }
+                else if(messageFromClient.equals("s")){
+                    int result = firstNumber-secondNumber;
+                    sendResult=Integer.toString(result);
+                    buffer = sendResult.getBytes();
+                    datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
+                    datagramSocket.send(datagramPacket);
+                }
+                else System.out.println("The client has entered something wrong.");
+
             }catch (IOException e){
                 e.printStackTrace();
                 break;
