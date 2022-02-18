@@ -14,15 +14,16 @@ public class Client {
 
     public void sendThenReceive(){
         Scanner scanner = new Scanner(System.in);
-        while (true){
+        String messageToSend = scanner.nextLine();
+        while (!messageToSend.equals("")){
             try{
-                String messageToSend = scanner.nextLine();
                 buffer = messageToSend.getBytes();
                 DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, 1234);
                 datagramSocket.send(datagramPacket);
                 datagramSocket.receive(datagramPacket);
                 String messageFromServer = new String(datagramPacket.getData(),0,datagramPacket.getLength());
                 System.out.println("The server says you said: "+ messageFromServer);
+                messageToSend = scanner.nextLine();
             }catch (IOException e){
                 e.printStackTrace();
                 break;
@@ -34,7 +35,11 @@ public class Client {
         DatagramSocket datagramSocket = new DatagramSocket();
         InetAddress inetAddress = InetAddress.getByName("localhost");
         Client client = new Client(datagramSocket,inetAddress);
-        System.out.println("Send datagram packets to a server.");
+        System.out.println("Hey, you have contact with the server!\n" +
+                           "In this program you can choose to either add or subtract two numbers.\n"+
+                           "You can quit this program by pressing the Enter button.\n"+
+                           "Enter a number:"
+        );
         client.sendThenReceive();
     }
 }
